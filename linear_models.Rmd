@@ -118,9 +118,12 @@ fit %>%
 So can we fit models by borough...?
 ```{r}
 nyc_airbnb %>%
-  nest(data = -borough) %>%
+  nest(df = -borough) %>%
   mutate(
-    models = map(.x = data, lm(price ~ stars + room_type, data = .x))
-  )
+    models = map(.x = df, ~lm(price ~ stars + room_type, data = .x)),
+    results = map(models, broom::tidy)
+  ) %>%
+  select(borough, results) %>%
+  unnest(results)
 ```
 
